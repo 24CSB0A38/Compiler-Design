@@ -1,0 +1,19 @@
+WEEK 6 – Model Improvement & Analysis
+
+Work Done:
+- Expanded dataset by adding additional errored C programs
+- Recollected and cleaned compiler error data
+- Retrained the classification model on the expanded dataset
+- Generated and analyzed confusion matrix
+- Performed detailed error analysis
+- Compared Naive Bayes and Logistic Regression models
+
+Results:
+- Week 5 accuracy: 75%
+- Week 6 accuracy: 83%
+- Improved stability and classification performance
+
+Outcome:
+The system became more robust and reliable after dataset expansion
+and model comparison.
+ 

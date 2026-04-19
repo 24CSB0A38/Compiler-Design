@@ -1,0 +1,19 @@
+WEEK 7 – System Integration & Demonstration
+
+Objective:
+Integrate the trained ML model into a usable system.
+
+Work Done:
+- Developed interactive CLI system (predict_cli.py)
+- Implemented end-to-end file-based prediction (predict_from_file.py)
+- Integrated hybrid rule-based and ML classification
+- Implemented confidence scoring
+- Improved error extraction and cleaning
+- Designed professional output formatting
+
+Outcome:
+The system now supports:
+1. Direct compiler error input
+2. Automatic compilation and classification from C source files
+
+This completes full system integration.

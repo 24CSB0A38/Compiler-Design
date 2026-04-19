@@ -1,0 +1,29 @@
+compiler,error_message,label
+gcc,"error: expected ';' before '}' token",syntax
+gcc,"error: expected identifier or '(' before '{' token",syntax
+gcc,"error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token",syntax
+gcc,"error: expected expression before '%=' token",syntax
+gcc,"error: invalid suffix ""k"" on integer constant",lexical
+gcc,"error: stray '\342' in program",lexical
+gcc,"error: empty character constant",lexical
+gcc,"error: missing terminating "" character",lexical
+gcc,"error: 'x' undeclared (first use in this function)",semantic
+gcc,"error: incompatible types when assigning to type 'int' from type 'char *'",semantic
+gcc,"error: dereferencing pointer to incomplete type",semantic
+gcc,"error: void value not ignored as it ought to be",semantic
+gcc,"error: lvalue required as left operand of assignment",semantic
+gcc,"error: format '%d' expects argument of type 'int', but argument 2 has type 'double'",semantic
+gcc,"error: array subscript is not an integer",semantic
+gcc,"error: redefinition of 'foo'",semantic
+gcc,"error: invalid type argument of '->' (have 'int')",semantic
+gcc,"error: too many arguments to function 'bar'",semantic
+gcc,"error: return makes integer from pointer without a cast",semantic
+gcc,"error: invalid operands to binary + (have 'int *' and 'char *')",semantic
+gcc,"error: expected declaration specifiers or '...' before 'if'",syntax
+gcc,"error: unknown type name 'String'",semantic
+gcc,"error: stray '#' in program",lexical
+gcc,"error: invalid preprocessing directive #includ",lexical
+gcc,"error: expected ')' before ';' token",syntax
+gcc,"error: initialization makes pointer from integer without a cast",semantic
+gcc,"error: passing argument 1 of 'printf' from incompatible pointer type",semantic
+gcc,"error: request for member 'age' in something not a structure or union",semantic

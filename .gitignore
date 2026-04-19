@@ -1,0 +1,32 @@
+# Large binary files
+gcc.zip
+mingw/
+mingw64/
+
+# Large recording files (exceed GitHub 100MB limit)
+Week_5 Recordings/
+Week_6 Recordings/
+Week_7 Recordings/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db

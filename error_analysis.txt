@@ -1,0 +1,17 @@
+ERROR ANALYSIS – WEEK 6
+
+Based on the confusion matrix, the model performs well in identifying
+semantic errors, as they often contain distinct keywords such as
+"undeclared" or "not defined".
+
+Some syntax errors are occasionally misclassified as lexical or
+semantic errors. This occurs because compiler error messages for
+syntax and semantic errors may share similar terms like "identifier",
+"expression", or "expected".
+
+The limited size of the dataset also contributes to misclassification,
+as the model has fewer examples to learn subtle differences between
+error categories.
+
+Increasing the dataset size and using additional models is expected
+to further improve classification accuracy.

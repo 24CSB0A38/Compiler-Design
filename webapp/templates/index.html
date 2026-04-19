@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligent Compiler Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="glass-background"></div>
+    
+    <main class="dashboard">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <h1>Intelligent Compiler <span>Suite</span></h1>
+            </div>
+            <p>Compile, auto-flag CWE vulnerabilities, and assess developer profiles via Machine Learning.</p>
+        </header>
+
+        <div class="layout-grid">
+            <!-- Left Panel: Input -->
+            <section class="input-panel glass-panel">
+                <div class="panel-header">
+                    <h2>Code Input</h2>
+                </div>
+                <form id="analyze-form">
+                    <div class="upload-zone" id="upload-zone">
+                        <input type="file" id="file-input" name="file" accept=".c">
+                        <p>Drag & Drop a <code>.c</code> file here or <span class="highlight">Browse</span></p>
+                        <p id="file-name" class="file-name"></p>
+                    </div>
+                    
+                    <div class="divider"><span>OR</span></div>
+                    
+                    <div class="editor-container">
+                        <textarea id="code-text" name="code_text" placeholder="#include <stdio.h>
+int main() {
+    printf('Hello Secure World');
+    return 0;
+}"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="submit-btn">
+                        <span>Analyze & Compile</span>
+                        <div class="spinner" id="spinner"></div>
+                    </button>
+                    <div id="error-toast" class="toast hidden"></div>
+                </form>
+            </section>
+
+            <!-- Right Panel: Output Dashboard -->
+            <section class="results-panel glass-panel hidden" id="results-panel">
+                <div class="panel-header">
+                    <h2>Analysis Report</h2>
+                    <span class="status-badge" id="compiler-status">Failed Compilation</span>
+                </div>
+
+                <div class="profile-card" id="profile-card">
+                    <h3>Developer Fingerprint Profiler</h3>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <span class="label">Skill Level</span>
+                            <strong id="prof-skill" class="gradient-text">Intermediate</strong>
+                        </div>
+                        <div class="stat-box">
+                            <span class="label">Total Errors</span>
+                            <strong id="prof-total">0</strong>
+                        </div>
+                        <div class="stat-box">
+                            <span class="label">Dominant Sub-type</span>
+                            <strong id="prof-dominant">SYNTAX</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="error-feed" id="error-feed">
+                    <!-- Error cards injected via JS -->
+                </div>
+            </section>
+
+            <section class="placeholder-panel glass-panel" id="placeholder-panel">
+                <div class="empty-state">
+                    <div class="pulse-ring"></div>
+                    <h3>Awaiting Code</h3>
+                    <p>Submit C code to execute the Machine Learning pipeline.</p>
+                </div>
+            </section>
+        </div>
+    </main>
+    <script src="/static/app.js"></script>
+</body>
+</html>

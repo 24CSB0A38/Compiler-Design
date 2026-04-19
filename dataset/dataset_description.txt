@@ -1,0 +1,22 @@
+Dataset Description: Compiler Error Classification
+
+This dataset contains compiler error messages generated using the GCC compiler.
+The errors are intentionally produced by compiling small C programs that contain
+known mistakes. Each error message is manually reviewed and labeled into one of
+three categories: lexical, syntax, or semantic.
+
+Columns:
+1. compiler       : Name of the compiler used (e.g., gcc).
+2. error_message  : Raw compiler diagnostic message captured from stderr.
+3. error_type     : Category of the error (lexical / syntax / semantic).
+
+Purpose:
+The dataset is designed for supervised machine learning experiments to classify
+compiler error messages. The raw error_message column is preserved for text
+preprocessing in later stages (Week 6), followed by feature extraction and model
+training (Week 7).
+
+Labeling Policy:
+- Lexical  : Invalid tokens, illegal characters, malformed literals.
+- Syntax   : Grammar violations such as missing semicolons or mismatched brackets.
+- Semantic : Meaning-related issues such as undeclared variables or type mismatch.

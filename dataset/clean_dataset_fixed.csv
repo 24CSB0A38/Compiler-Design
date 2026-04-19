@@ -1,0 +1,117 @@
+error_message,label
+error: expected ';' before 'return' token,syntax
+error: 'a' undeclared (first use in this function),semantic
+error: invalid suffix on integer constant,lexical
+error: expected ')' before '{' token,syntax
+error: incompatible types when assigning to type 'int' from type 'char *',semantic
+error: stray '@' in program,lexical
+error: expected expression before '}' token,syntax
+error: called object 'a' is not a function or function pointer,semantic
+error: invalid digit '9' in octal constant,lexical
+error: expected ';' at end of declaration int a = 10#; ^ ; 1 error generated.,lexical
+error: expected ';' at end of declaration int abc!; ^ ; 1 error generated.,lexical
+error: expected identifier or '(' int @a; ^ 1 error generated.,lexical
+error: expected expression int a = 10??; ^ error: expected expression int a = 10??; ^ error: expected ':' int a = 10??; ^ : note: to match this '?' int a = 10??; ^ error: expected expression int a = 10??; ^ error: expected ':' int a = 10??; ^ : note: to match this '?' int a = 10??; ^ error: expected expression int a = 10??; ^ 6 errors generated.,lexical
+error: expected ';' at end of declaration int _ = 5@; ^ ; 1 error generated.,lexical
+error: exponent has no digits int a = 12e; ^ 1 error generated.,lexical
+error: expected expression int a = 5 &|; ^ error: expected expression int a = 5 &|; ^ 2 errors generated.,lexical
+error: invalid digit '9' in octal constant int a = 09; ^ 1 error generated.,lexical
+error: expected identifier or '(' int 9abc; ^ 1 error generated.,lexical
+error: expected expression } ^ 1 error generated.,syntax
+error: expected ';' at end of declaration int a = 10 ^ ; 1 error generated.,syntax
+error: use of undeclared identifier 'a' if (a > 5) ^ error: expected expression int b = 10; ^ 2 errors generated.,syntax
+error: expected parameter declarator int main( { ^ error: expected ')' note: to match this '(' int main( { ^ error: expected function body after function declarator } ^ 3 errors generated.,syntax
+error: expected '(' after 'for' for i = 0; i < 5; i++ { ^ error: use of undeclared identifier 'i' for i = 0; i < 5; i++ { ^ error: use of undeclared identifier 'i' for i = 0; i < 5; i++ { ^ 3 errors generated.,syntax
+error: expected '}' int a = 10; ^ note: to match this '{' int main() { ^ 1 error generated.,syntax
+error: use of undeclared identifier 'a' if (a > 5 { ^ error: expected ')' if (a > 5 { ^ note: to match this '(' if (a > 5 { ^ error: expected statement } ^ 3 errors generated.,syntax
+error: expected ';' at end of declaration int a = 5 ^ ; 1 error generated.,syntax
+error: expected expression int a = ; ^ 1 error generated.,syntax
+error: use of undeclared identifier 'a' a = 5; ^ 1 error generated.,semantic
+"error: incompatible pointer to integer conversion returning 'char[6]' from a function with result type 'int' [-Wint-conversion] return ""hello""; ^~~~~~~ 1 error generated.",semantic
+"error: incompatible pointer to integer conversion assigning to 'int' from 'char[6]' [-Wint-conversion] a = ""hello""; ^ ~~~~~~~ 1 error generated.",semantic
+warning: division by zero is undefined [-Wdivision-by-zero] a = a / 0; ^ ~ 1 warning generated.,semantic
+error: use of undeclared identifier 'b' int a = b + 1; ^ 1 error generated.,semantic
+"error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char[5]' [-Wint-conversion] int a = ""text""; ^ ~~~~~~ 1 error generated.",semantic
+"error: call to undeclared library function 'printf' with type 'int (const char *, ...)'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration] printf(""%d"", a); ^ note: include the header <stdio.h> or explicitly provide a declaration for 'printf' 1 error generated.",semantic
+error: called object type 'int' is not a function or function pointer a(); ~^ 1 error generated.,semantic
+"warning: adding 'int' to a string does not append to the string [-Wstring-plus-int] int b = a + ""test""; ~~^~~~~~~~ note: use array indexing to silence this warning error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char *' [-Wint-conversion] int b = a + ""test""; ^ ~~~~~~~~~~ 1 warning and 1 error generated.",semantic
+error: redefinition of 'a' with a different type: 'float' vs 'int' float a = 5.5; ^ note: previous definition is here int a = 10; ^ 1 error generated.,semantic
+error: expected ';' before 'return' token,syntax
+error: 'a' undeclared (first use in this function),semantic
+error: invalid suffix on integer constant,lexical
+error: expected ')' before '{' token,syntax
+error: incompatible types when assigning to type 'int' from type 'char *',semantic
+error: stray '@' in program,lexical
+error: expected expression before '}' token,syntax
+error: called object 'a' is not a function or function pointer,semantic
+error: invalid digit '9' in octal constant,lexical
+error: expected ';' at end of declaration int a = 10#; ^ ; 1 error generated.,lexical
+error: expected ';' at end of declaration int abc!; ^ ; 1 error generated.,lexical
+error: expected identifier or '(' int @a; ^ 1 error generated.,lexical
+error: expected expression int a = 10??; ^ error: expected expression int a = 10??; ^ error: expected ':' int a = 10??; ^ : note: to match this '?' int a = 10??; ^ error: expected expression int a = 10??; ^ error: expected ':' int a = 10??; ^ : note: to match this '?' int a = 10??; ^ error: expected expression int a = 10??; ^ 6 errors generated.,lexical
+error: expected ';' at end of declaration int _ = 5@; ^ ; 1 error generated.,lexical
+error: exponent has no digits int a = 12e; ^ 1 error generated.,lexical
+error: expected expression int a = 5 &|; ^ error: expected expression int a = 5 &|; ^ 2 errors generated.,lexical
+error: invalid digit '9' in octal constant int a = 09; ^ 1 error generated.,lexical
+error: expected identifier or '(' int 9abc; ^ 1 error generated.,lexical
+error: expected expression } ^ 1 error generated.,syntax
+error: expected ';' at end of declaration int a = 10 ^ ; 1 error generated.,syntax
+error: use of undeclared identifier 'a' if (a > 5) ^ error: expected expression int b = 10; ^ 2 errors generated.,syntax
+error: expected parameter declarator int main( { ^ error: expected ')' note: to match this '(' int main( { ^ error: expected function body after function declarator } ^ 3 errors generated.,syntax
+error: expected '(' after 'for' for i = 0; i < 5; i++ { ^ error: use of undeclared identifier 'i' for i = 0; i < 5; i++ { ^ error: use of undeclared identifier 'i' for i = 0; i < 5; i++ { ^ 3 errors generated.,syntax
+error: expected '}' int a = 10; ^ note: to match this '{' int main() { ^ 1 error generated.,syntax
+error: use of undeclared identifier 'a' if (a > 5 { ^ error: expected ')' if (a > 5 { ^ note: to match this '(' if (a > 5 { ^ error: expected statement } ^ 3 errors generated.,syntax
+error: expected ';' at end of declaration int a = 5 ^ ; 1 error generated.,syntax
+error: expected expression int a = ; ^ 1 error generated.,syntax
+error: use of undeclared identifier 'a' a = 5; ^ 1 error generated.,semantic
+"error: incompatible pointer to integer conversion returning 'char[6]' from a function with result type 'int' [-Wint-conversion] return ""hello""; ^~~~~~~ 1 error generated.",semantic
+"error: incompatible pointer to integer conversion assigning to 'int' from 'char[6]' [-Wint-conversion] a = ""hello""; ^ ~~~~~~~ 1 error generated.",semantic
+warning: division by zero is undefined [-Wdivision-by-zero] a = a / 0; ^ ~ 1 warning generated.,semantic
+error: use of undeclared identifier 'b' int a = b + 1; ^ 1 error generated.,semantic
+"error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char[5]' [-Wint-conversion] int a = ""text""; ^ ~~~~~~ 1 error generated.",semantic
+"error: call to undeclared library function 'printf' with type 'int (const char *, ...)'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration] printf(""%d"", a); ^ note: include the header <stdio.h> or explicitly provide a declaration for 'printf' 1 error generated.",semantic
+error: called object type 'int' is not a function or function pointer a(); ~^ 1 error generated.,semantic
+"warning: adding 'int' to a string does not append to the string [-Wstring-plus-int] int b = a + ""test""; ~~^~~~~~~~ note: use array indexing to silence this warning error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char *' [-Wint-conversion] int b = a + ""test""; ^ ~~~~~~~~~~ 1 warning and 1 error generated.",semantic
+error: redefinition of 'a' with a different type: 'float' vs 'int' float a = 5.5; ^ note: previous definition is here int a = 10; ^ 1 error generated.,semantic
+error: expected ';' at end of declaration int a = 10#; ^ ; 1 error generated.,lexical
+error: expected expression int d = 7 ?? 4; ^ error: expected ':' int d = 7 ?? 4; ^ : note: to match this '?' int d = 7 ?? 4; ^ error: expected expression int d = 7 ?? 4; ^ error: expected ':' int d = 7 ?? 4; ^ : note: to match this '?' int d = 7 ?? 4; ^ error: expected expression int d = 7 ?? 4; ^ 5 errors generated.,lexical
+error: expected ';' at end of declaration int abc!; ^ ; 1 error generated.,lexical
+error: expected identifier or '(' int @a; ^ 1 error generated.,lexical
+error: expected expression int a = 10??; ^ error: expected expression int a = 10??; ^ error: expected ':' int a = 10??; ^ : note: to match this '?' int a = 10??; ^ error: expected expression int a = 10??; ^ error: expected ':' int a = 10??; ^ : note: to match this '?' int a = 10??; ^ error: expected expression int a = 10??; ^ 6 errors generated.,lexical
+error: expected ';' at end of declaration int e = 3 # 9; ^ ; 1 error generated.,lexical
+error: expected ';' at end of declaration int a = 10 @ 20; ^ ; 1 error generated.,lexical
+error: expected ';' at end of declaration int _ = 5@; ^ ; 1 error generated.,lexical
+error: exponent has no digits int a = 12e; ^ 1 error generated.,lexical
+error: expected expression int a = 5 &|; ^ error: expected expression int a = 5 &|; ^ 2 errors generated.,lexical
+error: expected ';' at end of declaration int b = 5 $ 3; ^ ; 1 error generated.,lexical
+error: invalid digit '9' in octal constant int a = 09; ^ 1 error generated.,lexical
+error: expected identifier or '(' int 9abc; ^ 1 error generated.,lexical
+error: type name requires a specifier or qualifier int c = 10 &^ 2; ^ error: expected expression 2 errors generated.,lexical
+error: expected expression } ^ 1 error generated.,syntax
+error: expected ';' at end of declaration int a = 10 ^ ; 1 error generated.,syntax
+error: use of undeclared identifier 'a' if (a > 5) ^ error: expected expression int b = 10; ^ 2 errors generated.,syntax
+"error: expected ';' after expression printf(""Hello"") ^ ; 1 error generated.",syntax
+error: expected parameter declarator int main( { ^ error: expected ')' note: to match this '(' int main( { ^ error: expected function body after function declarator } ^ 3 errors generated.,syntax
+error: expected '(' after 'for' for i = 0; i < 5; i++ { ^ error: use of undeclared identifier 'i' for i = 0; i < 5; i++ { ^ error: use of undeclared identifier 'i' for i = 0; i < 5; i++ { ^ 3 errors generated.,syntax
+"error: expected ';' after expression printf(""Hi"") ^ ; 1 error generated.",syntax
+error: expected '}' int a = 10; ^ note: to match this '{' int main() { ^ 1 error generated.,syntax
+error: use of undeclared identifier 'a' if (a > 5 { ^ error: expected ')' if (a > 5 { ^ note: to match this '(' if (a > 5 { ^ error: expected statement } ^ 3 errors generated.,syntax
+error: expected ';' at end of declaration int a = 5 ^ ; 1 error generated.,syntax
+error: expected ')' if (a > 3 { ^ note: to match this '(' if (a > 3 { ^ 1 error generated.,syntax
+error: expected expression int a = ; ^ 1 error generated.,syntax
+error: expected ';' in 'for' statement specifier for (int i = 0; i < 5 i++) { ^ 1 error generated.,syntax
+error: expected ';' at end of declaration int a = 10 ^ ; 1 error generated.,syntax
+error: use of undeclared identifier 'a' a = 5; ^ 1 error generated.,semantic
+"error: incompatible pointer to integer conversion returning 'char[6]' from a function with result type 'int' [-Wint-conversion] return ""hello""; ^~~~~~~ 1 error generated.",semantic
+error: non-object type 'int ()' is not assignable func = 10; ~~~~ ^ 1 error generated.,semantic
+error: use of undeclared identifier 'x' x = 10; ^ 1 error generated.,semantic
+"error: incompatible pointer to integer conversion assigning to 'int' from 'char[6]' [-Wint-conversion] a = ""hello""; ^ ~~~~~~~ 1 error generated.",semantic
+warning: division by zero is undefined [-Wdivision-by-zero] a = a / 0; ^ ~ 1 warning generated.,semantic
+error: use of undeclared identifier 'b' int a = b + 1; ^ 1 error generated.,semantic
+"error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char[5]' [-Wint-conversion] int a = ""text""; ^ ~~~~~~ 1 error generated.",semantic
+error: use of undeclared identifier 'b' a = b + 5; ^ 1 error generated.,semantic
+"error: call to undeclared library function 'printf' with type 'int (const char *, ...)'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration] printf(""%d"", a); ^ note: include the header <stdio.h> or explicitly provide a declaration for 'printf' 1 error generated.",semantic
+error: called object type 'int' is not a function or function pointer a(); ~^ 1 error generated.,semantic
+"warning: adding 'int' to a string does not append to the string [-Wstring-plus-int] int b = a + ""test""; ~~^~~~~~~~ note: use array indexing to silence this warning error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char *' [-Wint-conversion] int b = a + ""test""; ^ ~~~~~~~~~~ 1 warning and 1 error generated.",semantic
+"error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char[6]' [-Wint-conversion] int a = ""hello""; ^ ~~~~~~~ 1 error generated.",semantic
+error: redefinition of 'a' with a different type: 'float' vs 'int' float a = 5.5; ^ note: previous definition is here int a = 10; ^ 1 error generated.,semantic

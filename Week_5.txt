@@ -1,0 +1,18 @@
+WEEK 5 – Feature Engineering & Model Training
+
+Objective:
+Train a machine learning model to classify compiler errors into
+lexical, syntax, and semantic categories.
+
+Work Done:
+- Cleaned and validated compiler error dataset
+- Removed noisy elements such as file paths and line numbers
+- Balanced dataset across three error classes
+- Converted text data using TF-IDF vectorization
+- Trained Multinomial Naive Bayes classifier
+- Achieved 75% classification accuracy
+- Implemented live prediction using saved model
+
+Outcome:
+Successfully built an end-to-end compiler error classification system
+capable of predicting error types from raw compiler messages.

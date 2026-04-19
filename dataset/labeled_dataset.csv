@@ -1,0 +1,454 @@
+compiler,error_message,error_type
+gcc,error: expected ';' before 'return' token,syntax
+gcc,error: 'a' undeclared (first use in this function),semantic
+gcc,error: invalid suffix on integer constant,lexical
+gcc,error: expected ')' before '{' token,syntax
+gcc,error: incompatible types when assigning to type 'int' from type 'char *',semantic
+gcc,error: stray '@' in program,lexical
+gcc,error: expected expression before '}' token,syntax
+gcc,error: called object 'a' is not a function or function pointer,semantic
+gcc,error: invalid digit '9' in octal constant,lexical
+gcc,"../error_programs/lexical/lex4.c:2:15: error: expected ';' at end of declaration
+    int a = 10#;
+              ^
+              ;
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex7.c:2:12: error: expected ';' at end of declaration
+    int abc!;
+           ^
+           ;
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex3.c:2:9: error: expected identifier or '('
+    int @a;
+        ^
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex9.c:2:16: error: expected expression
+    int a = 10??;
+               ^
+../error_programs/lexical/lex9.c:2:17: error: expected expression
+    int a = 10??;
+                ^
+../error_programs/lexical/lex9.c:2:17: error: expected ':'
+    int a = 10??;
+                ^
+                : 
+../error_programs/lexical/lex9.c:2:16: note: to match this '?'
+    int a = 10??;
+               ^
+../error_programs/lexical/lex9.c:2:17: error: expected expression
+    int a = 10??;
+                ^
+../error_programs/lexical/lex9.c:2:17: error: expected ':'
+    int a = 10??;
+                ^
+                : 
+../error_programs/lexical/lex9.c:2:15: note: to match this '?'
+    int a = 10??;
+              ^
+../error_programs/lexical/lex9.c:2:17: error: expected expression
+    int a = 10??;
+                ^
+6 errors generated.",lexical
+gcc,"../error_programs/lexical/lex6.c:2:14: error: expected ';' at end of declaration
+    int _ = 5@;
+             ^
+             ;
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex8.c:2:15: error: exponent has no digits
+    int a = 12e;
+              ^
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex10.c:2:16: error: expected expression
+    int a = 5 &|;
+               ^
+../error_programs/lexical/lex10.c:2:17: error: expected expression
+    int a = 5 &|;
+                ^
+2 errors generated.",lexical
+gcc,"../error_programs/lexical/lex5.c:2:14: error: invalid digit '9' in octal constant
+    int a = 09;
+             ^
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex1.c:2:9: error: expected identifier or '('
+    int 9abc;
+        ^
+1 error generated.",lexical
+gcc,"../error_programs/syntax/syn5.c:3:1: error: expected expression
+}
+^
+1 error generated.",syntax
+gcc,"../error_programs/syntax/syn1.c:2:15: error: expected ';' at end of declaration
+    int a = 10
+              ^
+              ;
+1 error generated.",syntax
+gcc,"../error_programs/syntax/syn10.c:2:9: error: use of undeclared identifier 'a'
+    if (a > 5)
+        ^
+../error_programs/syntax/syn10.c:3:9: error: expected expression
+        int b = 10;
+        ^
+2 errors generated.",syntax
+gcc,"../error_programs/syntax/syn6.c:1:11: error: expected parameter declarator
+int main( {
+          ^
+../error_programs/syntax/syn6.c:1:11: error: expected ')'
+../error_programs/syntax/syn6.c:1:9: note: to match this '('
+int main( {
+        ^
+../error_programs/syntax/syn6.c:3:2: error: expected function body after function declarator
+}
+ ^
+3 errors generated.",syntax
+gcc,"../error_programs/syntax/syn8.c:2:9: error: expected '(' after 'for'
+    for i = 0; i < 5; i++ {
+        ^
+../error_programs/syntax/syn8.c:2:16: error: use of undeclared identifier 'i'
+    for i = 0; i < 5; i++ {
+               ^
+../error_programs/syntax/syn8.c:2:23: error: use of undeclared identifier 'i'
+    for i = 0; i < 5; i++ {
+                      ^
+3 errors generated.",syntax
+gcc,"../error_programs/syntax/syn7.c:2:16: error: expected '}'
+    int a = 10;
+               ^
+../error_programs/syntax/syn7.c:1:12: note: to match this '{'
+int main() {
+           ^
+1 error generated.",syntax
+gcc,"../error_programs/syntax/syn3.c:2:9: error: use of undeclared identifier 'a'
+    if (a > 5 {
+        ^
+../error_programs/syntax/syn3.c:2:15: error: expected ')'
+    if (a > 5 {
+              ^
+../error_programs/syntax/syn3.c:2:8: note: to match this '('
+    if (a > 5 {
+       ^
+../error_programs/syntax/syn3.c:5:1: error: expected statement
+}
+^
+3 errors generated.",syntax
+gcc,"../error_programs/syntax/syn9.c:2:14: error: expected ';' at end of declaration
+    int a = 5
+             ^
+             ;
+1 error generated.",syntax
+gcc,"../error_programs/syntax/syn4.c:2:13: error: expected expression
+    int a = ;
+            ^
+1 error generated.",syntax
+gcc,"../error_programs/semantic/sem1.c:2:5: error: use of undeclared identifier 'a'
+    a = 5;
+    ^
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem5.c:2:12: error: incompatible pointer to integer conversion returning 'char[6]' from a function with result type 'int' [-Wint-conversion]
+    return ""hello"";
+           ^~~~~~~
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem2.c:3:7: error: incompatible pointer to integer conversion assigning to 'int' from 'char[6]' [-Wint-conversion]
+    a = ""hello"";
+      ^ ~~~~~~~
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem8.c:3:11: warning: division by zero is undefined [-Wdivision-by-zero]
+    a = a / 0;
+          ^ ~
+1 warning generated.",semantic
+gcc,"../error_programs/semantic/sem6.c:2:13: error: use of undeclared identifier 'b'
+    int a = b + 1;
+            ^
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem10.c:4:13: error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char[5]' [-Wint-conversion]
+        int a = ""text"";
+            ^   ~~~~~~
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem9.c:3:5: error: call to undeclared library function 'printf' with type 'int (const char *, ...)'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+    printf(""%d"", a);
+    ^
+../error_programs/semantic/sem9.c:3:5: note: include the header <stdio.h> or explicitly provide a declaration for 'printf'
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem3.c:3:6: error: called object type 'int' is not a function or function pointer
+    a();
+    ~^
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem7.c:3:15: warning: adding 'int' to a string does not append to the string [-Wstring-plus-int]
+    int b = a + ""test"";
+            ~~^~~~~~~~
+../error_programs/semantic/sem7.c:3:15: note: use array indexing to silence this warning
+../error_programs/semantic/sem7.c:3:9: error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char *' [-Wint-conversion]
+    int b = a + ""test"";
+        ^   ~~~~~~~~~~
+1 warning and 1 error generated.",semantic
+gcc,"../error_programs/semantic/sem4.c:3:11: error: redefinition of 'a' with a different type: 'float' vs 'int'
+    float a = 5.5;
+          ^
+../error_programs/semantic/sem4.c:2:9: note: previous definition is here
+    int a = 10;
+        ^
+1 error generated.",semantic
+gcc,"../error_programs/lexical/lex4.c:2:15: error: expected ';' at end of declaration
+    int a = 10#;
+              ^
+              ;
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex_2.c:3:16: error: expected expression
+    int d = 7 ?? 4;
+               ^
+../error_programs/lexical/lex_2.c:3:19: error: expected ':'
+    int d = 7 ?? 4;
+                  ^
+                  : 
+../error_programs/lexical/lex_2.c:3:16: note: to match this '?'
+    int d = 7 ?? 4;
+               ^
+../error_programs/lexical/lex_2.c:3:19: error: expected expression
+    int d = 7 ?? 4;
+                  ^
+../error_programs/lexical/lex_2.c:3:19: error: expected ':'
+    int d = 7 ?? 4;
+                  ^
+                  : 
+../error_programs/lexical/lex_2.c:3:15: note: to match this '?'
+    int d = 7 ?? 4;
+              ^
+../error_programs/lexical/lex_2.c:3:19: error: expected expression
+    int d = 7 ?? 4;
+                  ^
+5 errors generated.",lexical
+gcc,"../error_programs/lexical/lex7.c:2:12: error: expected ';' at end of declaration
+    int abc!;
+           ^
+           ;
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex3.c:2:9: error: expected identifier or '('
+    int @a;
+        ^
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex9.c:2:16: error: expected expression
+    int a = 10??;
+               ^
+../error_programs/lexical/lex9.c:2:17: error: expected expression
+    int a = 10??;
+                ^
+../error_programs/lexical/lex9.c:2:17: error: expected ':'
+    int a = 10??;
+                ^
+                : 
+../error_programs/lexical/lex9.c:2:16: note: to match this '?'
+    int a = 10??;
+               ^
+../error_programs/lexical/lex9.c:2:17: error: expected expression
+    int a = 10??;
+                ^
+../error_programs/lexical/lex9.c:2:17: error: expected ':'
+    int a = 10??;
+                ^
+                : 
+../error_programs/lexical/lex9.c:2:15: note: to match this '?'
+    int a = 10??;
+              ^
+../error_programs/lexical/lex9.c:2:17: error: expected expression
+    int a = 10??;
+                ^
+6 errors generated.",lexical
+gcc,"../error_programs/lexical/lex_1.c:3:14: error: expected ';' at end of declaration
+    int e = 3 # 9;
+             ^
+             ;
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex_5.c:3:15: error: expected ';' at end of declaration
+    int a = 10 @ 20;
+              ^
+              ;
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex6.c:2:14: error: expected ';' at end of declaration
+    int _ = 5@;
+             ^
+             ;
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex8.c:2:15: error: exponent has no digits
+    int a = 12e;
+              ^
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex10.c:2:16: error: expected expression
+    int a = 5 &|;
+               ^
+../error_programs/lexical/lex10.c:2:17: error: expected expression
+    int a = 5 &|;
+                ^
+2 errors generated.",lexical
+gcc,"../error_programs/lexical/lex_4.c:3:14: error: expected ';' at end of declaration
+    int b = 5 $ 3;
+             ^
+             ;
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex5.c:2:14: error: invalid digit '9' in octal constant
+    int a = 09;
+             ^
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex1.c:2:9: error: expected identifier or '('
+    int 9abc;
+        ^
+1 error generated.",lexical
+gcc,"../error_programs/lexical/lex_3.c:3:19: error: type name requires a specifier or qualifier
+    int c = 10 &^ 2;
+                  ^
+../error_programs/lexical/lex_3.c:3:19: error: expected expression
+2 errors generated.",lexical
+gcc,"../error_programs/syntax/syn5.c:3:1: error: expected expression
+}
+^
+1 error generated.",syntax
+gcc,"../error_programs/syntax/syn1.c:2:15: error: expected ';' at end of declaration
+    int a = 10
+              ^
+              ;
+1 error generated.",syntax
+gcc,"../error_programs/syntax/syn10.c:2:9: error: use of undeclared identifier 'a'
+    if (a > 5)
+        ^
+../error_programs/syntax/syn10.c:3:9: error: expected expression
+        int b = 10;
+        ^
+2 errors generated.",syntax
+gcc,"../error_programs/syntax/syn_4.c:3:20: error: expected ';' after expression
+    printf(""Hello"")
+                   ^
+                   ;
+1 error generated.",syntax
+gcc,"../error_programs/syntax/syn6.c:1:11: error: expected parameter declarator
+int main( {
+          ^
+../error_programs/syntax/syn6.c:1:11: error: expected ')'
+../error_programs/syntax/syn6.c:1:9: note: to match this '('
+int main( {
+        ^
+../error_programs/syntax/syn6.c:3:2: error: expected function body after function declarator
+}
+ ^
+3 errors generated.",syntax
+gcc,"../error_programs/syntax/syn8.c:2:9: error: expected '(' after 'for'
+    for i = 0; i < 5; i++ {
+        ^
+../error_programs/syntax/syn8.c:2:16: error: use of undeclared identifier 'i'
+    for i = 0; i < 5; i++ {
+               ^
+../error_programs/syntax/syn8.c:2:23: error: use of undeclared identifier 'i'
+    for i = 0; i < 5; i++ {
+                      ^
+3 errors generated.",syntax
+gcc,"../error_programs/syntax/syn_3.c:4:21: error: expected ';' after expression
+        printf(""Hi"")
+                    ^
+                    ;
+1 error generated.",syntax
+gcc,"../error_programs/syntax/syn7.c:2:16: error: expected '}'
+    int a = 10;
+               ^
+../error_programs/syntax/syn7.c:1:12: note: to match this '{'
+int main() {
+           ^
+1 error generated.",syntax
+gcc,"../error_programs/syntax/syn3.c:2:9: error: use of undeclared identifier 'a'
+    if (a > 5 {
+        ^
+../error_programs/syntax/syn3.c:2:15: error: expected ')'
+    if (a > 5 {
+              ^
+../error_programs/syntax/syn3.c:2:8: note: to match this '('
+    if (a > 5 {
+       ^
+../error_programs/syntax/syn3.c:5:1: error: expected statement
+}
+^
+3 errors generated.",syntax
+gcc,"../error_programs/syntax/syn9.c:2:14: error: expected ';' at end of declaration
+    int a = 5
+             ^
+             ;
+1 error generated.",syntax
+gcc,"../error_programs/syntax/syn_2.c:4:15: error: expected ')'
+    if (a > 3 {
+              ^
+../error_programs/syntax/syn_2.c:4:8: note: to match this '('
+    if (a > 3 {
+       ^
+1 error generated.",syntax
+gcc,"../error_programs/syntax/syn4.c:2:13: error: expected expression
+    int a = ;
+            ^
+1 error generated.",syntax
+gcc,"../error_programs/syntax/syn_1.c:3:27: error: expected ';' in 'for' statement specifier
+    for (int i = 0; i < 5 i++) {
+                          ^
+1 error generated.",syntax
+gcc,"../error_programs/syntax/syn_5.c:3:15: error: expected ';' at end of declaration
+    int a = 10
+              ^
+              ;
+1 error generated.",syntax
+gcc,"../error_programs/semantic/sem1.c:2:5: error: use of undeclared identifier 'a'
+    a = 5;
+    ^
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem5.c:2:12: error: incompatible pointer to integer conversion returning 'char[6]' from a function with result type 'int' [-Wint-conversion]
+    return ""hello"";
+           ^~~~~~~
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem_1.c:4:10: error: non-object type 'int ()' is not assignable
+    func = 10;
+    ~~~~ ^
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem_5.c:3:5: error: use of undeclared identifier 'x'
+    x = 10;
+    ^
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem2.c:3:7: error: incompatible pointer to integer conversion assigning to 'int' from 'char[6]' [-Wint-conversion]
+    a = ""hello"";
+      ^ ~~~~~~~
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem8.c:3:11: warning: division by zero is undefined [-Wdivision-by-zero]
+    a = a / 0;
+          ^ ~
+1 warning generated.",semantic
+gcc,"../error_programs/semantic/sem6.c:2:13: error: use of undeclared identifier 'b'
+    int a = b + 1;
+            ^
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem10.c:4:13: error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char[5]' [-Wint-conversion]
+        int a = ""text"";
+            ^   ~~~~~~
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem_4.c:4:9: error: use of undeclared identifier 'b'
+    a = b + 5;
+        ^
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem9.c:3:5: error: call to undeclared library function 'printf' with type 'int (const char *, ...)'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+    printf(""%d"", a);
+    ^
+../error_programs/semantic/sem9.c:3:5: note: include the header <stdio.h> or explicitly provide a declaration for 'printf'
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem3.c:3:6: error: called object type 'int' is not a function or function pointer
+    a();
+    ~^
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem7.c:3:15: warning: adding 'int' to a string does not append to the string [-Wstring-plus-int]
+    int b = a + ""test"";
+            ~~^~~~~~~~
+../error_programs/semantic/sem7.c:3:15: note: use array indexing to silence this warning
+../error_programs/semantic/sem7.c:3:9: error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char *' [-Wint-conversion]
+    int b = a + ""test"";
+        ^   ~~~~~~~~~~
+1 warning and 1 error generated.",semantic
+gcc,"../error_programs/semantic/sem_3.c:3:9: error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char[6]' [-Wint-conversion]
+    int a = ""hello"";
+        ^   ~~~~~~~
+1 error generated.",semantic
+gcc,"../error_programs/semantic/sem4.c:3:11: error: redefinition of 'a' with a different type: 'float' vs 'int'
+    float a = 5.5;
+          ^
+../error_programs/semantic/sem4.c:2:9: note: previous definition is here
+    int a = 10;
+        ^
+1 error generated.",semantic
