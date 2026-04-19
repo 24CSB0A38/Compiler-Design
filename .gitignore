@@ -1,5 +1,5 @@
 # Large binary files
-gcc.zip
+# gcc.zip tracked via LFS
 mingw/
 mingw64/
 
