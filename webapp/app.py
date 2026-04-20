@@ -43,6 +43,27 @@ if os.path.exists(MODEL_PATH):
     except Exception as e:
         print(f"Failed to load model: {e}")
 
+def _custom_lexical_scan(code, temp_file_path):
+    """
+    Custom pre-compile scanner that detects invalid characters GCC may silently
+    accept (e.g. $ in identifiers, backticks, etc.) and returns synthetic errors.
+    """
+    INVALID_CHARS = {
+        '$': "error: stray '$' in program",
+        '`': "error: stray '`' in program",
+        '@': "error: stray '@' in program",
+    }
+    found_errors = []
+    for line_num, line in enumerate(code.splitlines(), start=1):
+        # Skip string/comment content  
+        stripped = re.sub(r'".*?"', '""', line)  # blank out string literals
+        stripped = re.sub(r'//.*', '', stripped)   # strip line comments
+        for char, msg in INVALID_CHARS.items():
+            if char in stripped:
+                col = stripped.index(char) + 1
+                found_errors.append(f"{temp_file_path}:{line_num}:{col}: {msg}")
+    return found_errors
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -89,9 +110,17 @@ def analyze_code():
         if gcc_path == "gcc" and shutil.which("gcc") is None:
             raise FileNotFoundError("GCC Missing")
             
-        result = subprocess.run([gcc_path, "-fmax-errors=100", TEMP_FILE], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        result = subprocess.run(
+            [gcc_path, "-fmax-errors=100", "-pedantic-errors", TEMP_FILE],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
         error_lines = result.stderr.strip().split("\n")
         compiler_return_code = result.returncode
+
+        # Pre-compile custom lexical scanner for chars GCC might silently accept
+        custom_errors = _custom_lexical_scan(code_content, TEMP_FILE)
+        if custom_errors:
+            error_lines = custom_errors + [l for l in error_lines if l.strip()]
     except FileNotFoundError:
         # FAST DEMO FALLBACK: If GCC is still installing or missing, we mock realistic compiler errors so the Dashboard still works!
         error_lines = []
