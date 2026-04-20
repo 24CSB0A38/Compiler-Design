@@ -29,7 +29,24 @@ class CWETagger:
         }
         
         error_lower = error_text.lower()
-        if predicted_class.lower() == "semantic":
+
+        if predicted_class.lower() == "lexical":
+            # Lexical errors = malformed input tokens -> CWE-20 Improper Input Validation
+            cwe_data = {
+                "cwe_id": "CWE-20",
+                "cwe_name": "Improper Input Validation (Malformed Token)",
+                "severity": "MEDIUM"
+            }
+
+        elif predicted_class.lower() == "syntax":
+            # Syntax errors = structural grammar violations -> CWE-1025
+            cwe_data = {
+                "cwe_id": "CWE-1025",
+                "cwe_name": "Comparison Using Wrong Factors (Grammar Violation)",
+                "severity": "LOW"
+            }
+
+        elif predicted_class.lower() == "semantic":
             # Search curated mapping table
             for keyword, data in self.cwe_mapping.items():
                 if keyword in error_lower:
