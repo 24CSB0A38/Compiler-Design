@@ -120,7 +120,12 @@ def analyze_code():
         # Pre-compile custom lexical scanner for chars GCC might silently accept
         custom_errors = _custom_lexical_scan(code_content, TEMP_FILE)
         if custom_errors:
-            error_lines = custom_errors + [l for l in error_lines if l.strip()]
+            # Only add custom errors whose message isn't already in GCC output
+            gcc_text = " ".join(error_lines).lower()
+            for ce in custom_errors:
+                ce_msg = ce.split(": ", 2)[-1].lower()
+                if ce_msg not in gcc_text:
+                    error_lines.insert(0, ce)
     except FileNotFoundError:
         # FAST DEMO FALLBACK: If GCC is still installing or missing, we mock realistic compiler errors so the Dashboard still works!
         error_lines = []
@@ -139,11 +144,19 @@ def analyze_code():
     if os.path.exists(TEMP_FILE):
         os.remove(TEMP_FILE)
         
-    # Extract ALL errors and warnings (improved regex to be more inclusive)
-    all_errors = [line for line in error_lines if any(kw in line.lower() for kw in ["error:", "warning:", "note:"])]
-    if not all_errors and error_lines and len(error_lines[0].strip()) > 5:
-        # Fallback if gcc emits a specific issue without standard keywords
-        all_errors = [error_lines[0]]
+    # Extract ALL errors and warnings, then deduplicate by cleaned message
+    all_errors_raw = [line for line in error_lines if any(kw in line.lower() for kw in ["error:", "warning:", "note:"])]
+    if not all_errors_raw and error_lines and len(error_lines[0].strip()) > 5:
+        all_errors_raw = [error_lines[0]]
+
+    # Deduplicate: strip file:line:col prefix, keep first occurrence of each unique message
+    seen_msgs = set()
+    all_errors = []
+    for line in all_errors_raw:
+        clean_msg = re.sub(r".*?:\d+:\d+:\s*", "", line).strip().lower()
+        if clean_msg and clean_msg not in seen_msgs:
+            seen_msgs.add(clean_msg)
+            all_errors.append(line)
         
     if compiler_return_code == 0 and not all_errors:
         return jsonify({
