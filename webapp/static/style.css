@@ -121,6 +121,12 @@ header p {
     cursor: pointer;
 }
 
+.file-name.active {
+    margin-top: 0.5rem;
+    color: var(--success);
+    font-weight: 600;
+}
+
 .highlight {
     color: var(--primary);
     font-weight: 600;

@@ -18,10 +18,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const profDominant = document.getElementById("prof-dominant");
     const errorFeed = document.getElementById("error-feed");
 
+    const codeTextArea = document.getElementById("code-text");
+
     fileInput.addEventListener("change", (e) => {
         if(e.target.files.length > 0) {
             fileNameDisplay.textContent = `Selected: ${e.target.files[0].name}`;
-            document.getElementById("code-text").value = ""; // Clear text area if file picked
+            codeTextArea.value = ""; // Clear text area if file picked
+            fileNameDisplay.classList.add("active");
+        }
+    });
+
+    // Clear file if user types in text area
+    codeTextArea.addEventListener("input", () => {
+        if (fileInput.value) {
+            fileInput.value = "";
+            fileNameDisplay.textContent = "";
+            fileNameDisplay.classList.remove("active");
         }
     });
 
@@ -60,9 +72,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     
     function renderDashboard(data) {
-        // Swap panels
+        // Reset and show panels
         placeholderPanel.classList.add("hidden");
         resultsPanel.classList.remove("hidden");
+        errorFeed.innerHTML = ""; // Always clear previous results
         
         // Success state
         if (data.status === "success" || data.total_errors === 0) {

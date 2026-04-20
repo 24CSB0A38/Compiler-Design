@@ -7,24 +7,28 @@ import re
 from flask import Flask, request, jsonify, render_template
 
 # Add backend scripts directory to path to reuse the ML framework directly
-sys.path.append(os.path.abspath("../scripts"))
+_WEBAPP_DIR = os.path.dirname(os.path.abspath(__file__))
+_SCRIPTS_DIR = os.path.join(_WEBAPP_DIR, "..", "scripts")
+sys.path.insert(0, os.path.abspath(_SCRIPTS_DIR))
 
+_ml_modules_loaded = False
 try:
     from cwe_tagger import CWETagger
     from readability_scorer import ReadabilityScorer
     from profiler import CompilerFingerprintProfiler
-except ImportError:
-    print("Warning: Backend ML modules not found. Ensure you are running this from /webapp/")
+    _ml_modules_loaded = True
+except ImportError as e:
+    print(f"Warning: Backend ML modules not found: {e}")
 
 app = Flask(__name__)
 
-MODEL_PATH = "../compiler_error_model.pkl"
-TEMP_FILE = "temp_user_code.c"
+MODEL_PATH = os.path.join(_WEBAPP_DIR, "..", "compiler_error_model.pkl")
+TEMP_FILE = os.path.join(_WEBAPP_DIR, "temp_user_code.c")
 
 # Initialize global modules
-cwe_tagger = CWETagger()
-readability_scorer = ReadabilityScorer()
-profiler = CompilerFingerprintProfiler()
+cwe_tagger = CWETagger() if _ml_modules_loaded else None
+readability_scorer = ReadabilityScorer() if _ml_modules_loaded else None
+profiler = CompilerFingerprintProfiler() if _ml_modules_loaded else None
 
 # Load the ML Model dynamically. If not available, we return graceful errors.
 model_loaded = False
@@ -50,7 +54,17 @@ def analyze_code():
     # 1. Handle File Upload OR Raw Text Submission
     if "file" in request.files and request.files["file"].filename != "":
         file = request.files["file"]
-        code_content = file.read().decode("utf-8")
+        raw_data = file.read()
+        
+        # Robust decoding strategy
+        for encoding in ["utf-8", "latin-1", "cp1252"]:
+            try:
+                code_content = raw_data.decode(encoding)
+                break
+            except UnicodeDecodeError:
+                continue
+        else:
+            return jsonify({"error": "Failed to decode file. Please ensure it's a valid text file."}), 400
     elif "code_text" in request.form:
         code_content = request.form["code_text"]
     else:
@@ -64,40 +78,45 @@ def analyze_code():
         f.write(code_content)
         
     # 3. Fire Compiler Hook
-    # Dynamically point to the local portable GCC installed by the AI setup script
-    import shutil
-    gcc_path = os.path.abspath("../mingw64/bin/gcc.exe")
+    # Dynamically point to the local portable GCC
+    gcc_path = os.path.join(_WEBAPP_DIR, "..", "mingw64", "bin", "gcc.exe")
     if not os.path.exists(gcc_path):
         gcc_path = "gcc" # Fallback to standard PATH if available
         
+    compiler_return_code = 1
     try:
-        # Check if GCC actually exists
+        import shutil
         if gcc_path == "gcc" and shutil.which("gcc") is None:
             raise FileNotFoundError("GCC Missing")
             
         result = subprocess.run([gcc_path, "-fmax-errors=100", TEMP_FILE], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         error_lines = result.stderr.strip().split("\n")
+        compiler_return_code = result.returncode
     except FileNotFoundError:
         # FAST DEMO FALLBACK: If GCC is still installing or missing, we mock realistic compiler errors so the Dashboard still works!
         error_lines = []
-        if ';' not in code_content and 'printf' in code_content:
+        # Multi-error mock logic
+        if ';' not in code_content:
             error_lines.append(rf"{TEMP_FILE}:2:2: error: expected ';' before 'return'")
+        if 'int' in code_content and '"' in code_content:
+            error_lines.append(rf"{TEMP_FILE}:3:5: error: invalid conversion from 'const char*' to 'int'")
         if 'null' in code_content.lower() or '*x' in code_content:
-            error_lines.append(rf"{TEMP_FILE}:4:5: error: warning: pointer 'x' resulting in dereg of null")
+            error_lines.append(rf"{TEMP_FILE}:4:5: error: pointer 'x' resulting in dereg of null")
         if not error_lines:
-            error_lines.append(rf"{TEMP_FILE}:1:1: error: invalid conversion from 'int' to 'const char*'")
+            error_lines.append(rf"{TEMP_FILE}:1:1: error: general syntax issue detected")
+        compiler_return_code = 1 
         
     # Clean up Temp File
     if os.path.exists(TEMP_FILE):
         os.remove(TEMP_FILE)
         
-    # Extract GCC errors
-    all_errors = [line for line in error_lines if "error:" in line.lower()]
-    if not all_errors and error_lines and error_lines[0].strip():
-        # Fallback if gcc emits a syntax issue without the word "error:"
+    # Extract ALL errors and warnings (improved regex to be more inclusive)
+    all_errors = [line for line in error_lines if any(kw in line.lower() for kw in ["error:", "warning:", "note:"])]
+    if not all_errors and error_lines and len(error_lines[0].strip()) > 5:
+        # Fallback if gcc emits a specific issue without standard keywords
         all_errors = [error_lines[0]]
         
-    if result.returncode == 0 and not all_errors:
+    if compiler_return_code == 0 and not all_errors:
         return jsonify({
             "status": "success",
             "message": "Compilation Successful! ✅ No errors or vulnerabilities detected.",

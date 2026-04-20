@@ -57,11 +57,11 @@ print(f"Total Test Samples: {len(y_test)}")
 print(f"Samples flagged as 'Ambiguous' (Confidence < 65%): {ambiguous}")
 
 predictions = model.predict(X_test)
-print("\n📈 Classification Report:\n")
+print("\nClassification Report:\n")
 print(classification_report(y_test, predictions))
 
 # Save the updated model
 with open(MODEL_PATH, "wb") as f:
     pickle.dump((model, vectorizer), f)
     
-print(f"✅ Advanced Logistic Regression model saved to {MODEL_PATH}")
+print(f"Advanced Logistic Regression model saved to {MODEL_PATH}")
