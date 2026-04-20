@@ -26,18 +26,19 @@ Instantly classifies unambiguous errors using pattern matching:
 - **Syntax**: `expected ';'`, `expected ')'`, `at end of input`, `expected identifier`
 - **Semantic**: `undeclared`, `conflicting types`, `incompatible types`, `too many arguments`
 
-### Layer 2 — Machine Learning Model (97.1% accuracy)
-For edge cases not caught by rules, a **Linear SVM** trained on **9,989 real GCC errors** handles classification.
+### Layer 2 — Machine Learning Model (97.05% accuracy)
+For edge cases not caught by rules, an **Advanced Stacking Ensemble Model** takes over. It trains three base models (Linear SVM, Multinomial Naive Bayes, Random Forest) and uses a Logistic Regression Meta-Model to combine their predictions, achieving maximum robustness.
 
 ---
 
 ## 📊 Model Performance
 
-| Model | Accuracy | F1-Score |
+| Model Architecture | Accuracy | F1-Score |
 |---|---|---|
-| **Linear SVM (Winner)** | **97.10%** | **97.10%** |
-| Logistic Regression | 85.64% | 84.01% |
-| Multinomial Naive Bayes | 86.44% | 85.00% |
+| **Stacking Ensemble (WINNER)** | **97.05%** | **97.05%** |
+| Linear SVM (Base) | 97.10% | 97.10% |
+| Logistic Regression (Base) | 85.64% | 84.01% |
+| Multinomial Naive Bayes (Base)| 86.44% | 85.00% |
 
 ---
 
@@ -55,8 +56,9 @@ LJ/
 ├── scripts/                    # ML Pipeline
 │   ├── fetch_clacer.py         # Parallel dataset expansion (9,989 samples)
 │   ├── relabel_dataset.py      # Dataset label sanitization
-│   ├── compare_models.py       # Multi-model competition & auto-selection
-│   ├── train_model.py          # Model training with temporal simulation
+│   ├── compare_models.py       # Multi-model competition
+│   ├── train_stacking_model.py # Trains the advanced Stacking Ensemble model
+│   ├── train_model.py          # Baseline model training with temporal simulation
 │   ├── cwe_tagger.py           # CWE security vulnerability tagger
 │   ├── readability_scorer.py   # Error readability scoring (0-10)
 │   └── profiler.py             # Developer fingerprint profiler
@@ -65,7 +67,7 @@ LJ/
 │   ├── clacer_dataset.csv      # 9,989 real GCC errors (sanitized)
 │   └── CLACER_repo/            # Raw CLACER research dataset (16,925 programs)
 │
-├── compiler_error_model.pkl    # Trained Linear SVM + TF-IDF vectorizer
+├── compiler_error_model.pkl    # Trained Stacking Ensemble Model + TF-IDF vectorizer
 ├── mingw64/                    # Portable GCC compiler (local)
 └── gcc.zip                     # GCC installer (Git LFS)
 ```
@@ -121,7 +123,7 @@ The **CLACER Dataset** (Compiler Language Analysis and Classification of Error R
 ## 🛠 Tech Stack
 
 - **Backend**: Python, Flask
-- **ML**: scikit-learn (SVM, Logistic Regression, Naive Bayes), TF-IDF
+- **ML**: scikit-learn (StackingClassifier, SVM, Random Forest, Naive Bayes), TF-IDF
 - **Frontend**: HTML5, Vanilla CSS (glassmorphism), JavaScript (async fetch)
 - **Compiler**: GCC via MinGW64 (portable)
 - **Dataset**: CLACER (NIT-Warangal PBL processed version)
