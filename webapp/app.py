@@ -135,9 +135,54 @@ def analyze_code():
         clean_error = re.sub(r".*?:\d+:\d+:\s*", "", raw_error).strip()
         
         # Predictive analytics
+        # --- LAYER 1: DETERMINISTIC RULE-BASED OVERRIDE (always correct) ---
+        # These patterns are unambiguous and override the ML model 100% of the time
+        LEXICAL_RULES = [
+            r"stray", r"missing terminating", r"invalid suffix", r"empty character constant",
+            r"null character", r"invalid preprocessing directive", r"extra tokens at end of"
+        ]
+        SYNTAX_RULES = [
+            r"expected ';'", r"expected '\)'", r"expected '\}'", r"expected '\]'",
+            r"expected expression", r"expected identifier", r"expected declaration",
+            r"before '\\w' token", r"at end of input", r"unbalanced", r"unrecognized escape"
+        ]
+        SEMANTIC_RULES = [
+            r"undeclared", r"has no member", r"not a member", r"conflicting types",
+            r"incompatible types", r"too many arguments", r"too few arguments",
+            r"void value not ignored", r"is not a function", r"does not refer to a type",
+            r"dereferencing pointer", r"subscripted value is", r"cannot convert", r"size of array"
+        ]
+
+        rule_prediction = None
+        clean_lower = clean_error.lower()
+        for pattern in LEXICAL_RULES:
+            if re.search(pattern, clean_lower):
+                rule_prediction = "lexical"
+                break
+        if not rule_prediction:
+            for pattern in SYNTAX_RULES:
+                if re.search(pattern, clean_lower):
+                    rule_prediction = "syntax"
+                    break
+        if not rule_prediction:
+            for pattern in SEMANTIC_RULES:
+                if re.search(pattern, clean_lower):
+                    rule_prediction = "semantic"
+                    break
+
+        # --- LAYER 2: ML MODEL (fallback for unknown patterns) ---
         vec = vectorizer.transform([clean_error])
-        prediction = ml_model.predict(vec)[0]
-        confidence = max(ml_model.predict_proba(vec)[0])
+        ml_prediction = ml_model.predict(vec)[0]
+        ml_confidence = max(ml_model.predict_proba(vec)[0])
+
+        # Use rule if matched, otherwise trust the ML model
+        if rule_prediction:
+            prediction = rule_prediction
+            confidence = 0.999  # Deterministic = 99.9% confidence
+        else:
+            prediction = ml_prediction
+            confidence = ml_confidence
+
         ambiguous_flag = True if confidence < 0.65 else False
         
         # Readability & Security
