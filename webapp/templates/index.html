@@ -3,46 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligent Compiler Dashboard</title>
-    <meta name="description" content="ML-Enhanced Compiler Error Classification System with CWE tagging, time complexity analysis, and developer profiling.">
-    <meta name="darkreader-lock">
-    <meta name="color-scheme" content="light only">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css?v=9">
+    <title>Intelligent Compiler Suite</title>
+    <meta name="description" content="ML-Enhanced Compiler with CWE tagging, Green Computing metrics, time complexity analysis and developer profiling.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=10">
 </head>
 <body>
-    <!-- Animated gradient orbs -->
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
 
     <main class="dashboard">
-        <!-- ───── HEADER ───── -->
+
+        <!-- ── HEADER ── -->
         <header>
             <div class="logo">
                 <div class="logo-icon">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="16 18 22 12 16 6"></polyline>
                         <polyline points="8 6 2 12 8 18"></polyline>
                     </svg>
                 </div>
-                <h1>Intelligent Compiler <span>Suite</span></h1>
+                <h1>Intelligent Compiler <span class="brand-gradient">Suite</span></h1>
             </div>
-            <p class="subtitle">Compile, auto-flag CWE vulnerabilities, and assess developer profiles via Machine Learning.</p>
-            <div class="header-badge">
-                🧠 Powered by Advanced Stacking Ensemble Classifier
+            <p class="subtitle">Compile · Classify Errors · Detect CWE Vulnerabilities · Green Computing Analysis</p>
+            <div class="header-chips">
+                <span class="chip chip-purple">🧠 Stacking Ensemble Classifier</span>
+                <span class="chip chip-green">🌿 Green Computing Engine</span>
             </div>
         </header>
 
-        <!-- ───── TWO-COLUMN LAYOUT ───── -->
+        <!-- ── LAYOUT ── -->
         <div class="layout-grid">
 
-            <!-- ══ LEFT: Code Input Panel ══ -->
-            <section class="glass-panel input-panel" id="input-panel">
-                <div class="panel-header">
-                    <div class="panel-title">
-                        <div class="panel-icon input-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            <!-- ══ LEFT: Input Panel ══ -->
+            <section class="card input-panel" id="input-panel">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="icon-badge icon-indigo">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                         </div>
                         <h2>Code Input</h2>
                     </div>
@@ -53,38 +49,43 @@
                     <div class="upload-zone" id="upload-zone">
                         <input type="file" id="file-input" name="file" accept=".c">
                         <div class="upload-icon">📄</div>
-                        <p>Drag & Drop a <code>.c</code> file or <span class="highlight">Browse</span></p>
+                        <p>Drag &amp; Drop a <code>.c</code> file or <span class="link-text">Browse</span></p>
                         <p id="file-name" class="file-name"></p>
                     </div>
 
-                    <div class="divider"><span>OR</span></div>
+                    <div class="divider"><span>OR TYPE CODE BELOW</span></div>
 
-                    <!-- Code editor with line numbers -->
-                    <div class="editor-wrapper" id="editor-wrapper">
-                        <div class="editor-topbar">
-                            <div class="editor-dots">
+                    <!-- Editor -->
+                    <div class="editor-wrap" id="editor-wrap">
+                        <div class="editor-bar">
+                            <div class="mac-dots">
                                 <span class="dot red"></span>
                                 <span class="dot yellow"></span>
                                 <span class="dot green"></span>
                             </div>
-                            <span class="editor-lang">C Language</span>
+                            <span class="editor-label">C Language</span>
+                            <span class="editor-info" id="editor-info">Ready</span>
                         </div>
-                        <div class="editor-body">
-                            <div class="line-numbers" id="line-numbers">1</div>
-                            <textarea id="code-text" name="code_text" spellcheck="false" placeholder="#include <stdio.h>
+                        <!-- Code view shown AFTER analysis (highlighted) -->
+                        <div class="code-view hidden" id="code-view"></div>
+                        <!-- Textarea shown BEFORE analysis / while editing -->
+                        <div class="editor-body" id="editor-body">
+                            <div class="line-nums" id="line-nums">1</div>
+                            <textarea id="code-text" name="code_text" spellcheck="false"
+                                placeholder="#include <stdio.h>
 int main() {
     printf(&quot;Hello Secure World&quot;);
     return 0;
 }"></textarea>
                         </div>
-                        <!-- Error highlight gutter (overlayed) -->
-                        <div class="error-gutter" id="error-gutter"></div>
+                        <!-- Edit button shown after analysis -->
+                        <button type="button" class="edit-btn hidden" id="edit-btn">✏️ Edit Code</button>
                     </div>
 
                     <button type="submit" class="submit-btn" id="submit-btn">
-                        <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                        <svg class="btn-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
                         <span id="btn-text">Analyze &amp; Compile</span>
-                        <div class="spinner" id="spinner"></div>
+                        <div class="spinner hidden" id="spinner"></div>
                     </button>
 
                     <div id="error-toast" class="toast hidden"></div>
@@ -92,18 +93,18 @@ int main() {
             </section>
 
             <!-- ══ RIGHT: Results Panel ══ -->
-            <section class="glass-panel results-panel hidden" id="results-panel">
-                <div class="panel-header">
-                    <div class="panel-title">
-                        <div class="panel-icon result-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            <section class="card results-panel hidden" id="results-panel">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="icon-badge icon-teal">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                         </div>
                         <h2>Analysis Report</h2>
                     </div>
                     <span class="status-badge" id="compiler-status">Analysing…</span>
                 </div>
 
-                <!-- Compiler success banner -->
+                <!-- Success banner -->
                 <div class="success-banner hidden" id="success-banner">
                     <div class="success-icon">✅</div>
                     <div>
@@ -112,60 +113,108 @@ int main() {
                     </div>
                 </div>
 
-                <!-- Time Complexity Card -->
-                <div class="complexity-card" id="complexity-card">
-                    <div class="complexity-header">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                <!-- Time Complexity -->
+                <div class="info-card tc-card" id="tc-card">
+                    <div class="info-card-label">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                         Time Complexity
                     </div>
-                    <div class="complexity-body">
-                        <span class="complexity-notation" id="tc-notation">—</span>
-                        <div class="complexity-meta">
-                            <span class="complexity-label" id="tc-label">—</span>
-                            <span class="complexity-explanation" id="tc-explanation">—</span>
+                    <div class="tc-body">
+                        <span class="tc-notation" id="tc-notation">—</span>
+                        <div class="tc-meta">
+                            <strong class="tc-label" id="tc-label">—</strong>
+                            <span class="tc-explain" id="tc-explanation">—</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Developer Profile Card -->
-                <div class="profile-card" id="profile-card">
-                    <div class="profile-title">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <!-- Green Computing Card -->
+                <div class="info-card green-card" id="green-card">
+                    <div class="info-card-label green-label">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2z"></path><path d="M12 6v6l4 2"></path></svg>
+                        🌿 Green Computing Analysis
+                    </div>
+
+                    <!-- Grade + key stats row -->
+                    <div class="green-top">
+                        <div class="green-grade-wrap">
+                            <div class="green-grade" id="green-grade">A+</div>
+                            <div class="green-grade-label">Energy Grade</div>
+                        </div>
+                        <div class="green-stats">
+                            <div class="green-stat">
+                                <span class="gstat-label">⚡ Energy Used</span>
+                                <span class="gstat-val" id="gc-energy">—</span>
+                            </div>
+                            <div class="green-stat">
+                                <span class="gstat-label">🌍 Carbon Footprint</span>
+                                <span class="gstat-val" id="gc-carbon">—</span>
+                            </div>
+                            <div class="green-stat">
+                                <span class="gstat-label">🔢 Est. Operations</span>
+                                <span class="gstat-val" id="gc-ops">—</span>
+                            </div>
+                            <div class="green-stat">
+                                <span class="gstat-label">📊 Efficiency Score</span>
+                                <span class="gstat-val" id="gc-score">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Memory leak warning -->
+                    <div class="memory-warning hidden" id="memory-warning">
+                        ⚠️ Possible memory leak detected — <code>malloc()</code> without matching <code>free()</code>
+                    </div>
+
+                    <!-- Efficiency bar -->
+                    <div class="eff-bar-wrap">
+                        <div class="eff-bar-track">
+                            <div class="eff-bar-fill" id="eff-bar-fill" style="width:0%"></div>
+                        </div>
+                        <span class="eff-bar-label" id="eff-bar-label">0% efficient</span>
+                    </div>
+
+                    <!-- Suggestions -->
+                    <div class="green-suggestions" id="green-suggestions"></div>
+                </div>
+
+                <!-- Developer Profile -->
+                <div class="info-card profile-card" id="profile-card">
+                    <div class="info-card-label">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         Developer Fingerprint Profiler
                     </div>
                     <div class="stats-grid">
                         <div class="stat-box">
-                            <span class="label">Skill Level</span>
-                            <strong id="prof-skill" class="gradient-text">—</strong>
+                            <span class="stat-label">Skill Level</span>
+                            <strong id="prof-skill" class="stat-val gradient-text">—</strong>
                         </div>
                         <div class="stat-box">
-                            <span class="label">Total Errors</span>
-                            <strong id="prof-total">0</strong>
+                            <span class="stat-label">Total Errors</span>
+                            <strong id="prof-total" class="stat-val">0</strong>
                         </div>
                         <div class="stat-box">
-                            <span class="label">Dominant Sub-type</span>
-                            <strong id="prof-dominant">—</strong>
+                            <span class="stat-label">Dominant Type</span>
+                            <strong id="prof-dominant" class="stat-val">—</strong>
                         </div>
                     </div>
                 </div>
 
                 <!-- Error Feed -->
-                <div class="error-feed" id="error-feed">
-                    <!-- Error cards injected via JS -->
-                </div>
+                <div class="error-feed" id="error-feed"></div>
             </section>
 
-            <!-- Placeholder while idle -->
-            <section class="glass-panel placeholder-panel" id="placeholder-panel">
+            <!-- Placeholder -->
+            <section class="card placeholder-panel" id="placeholder-panel">
                 <div class="empty-state">
                     <div class="pulse-ring"></div>
                     <h3>Awaiting Code</h3>
-                    <p>Submit C code to execute the Machine Learning pipeline.</p>
+                    <p>Submit C code to execute the ML pipeline and get instant error classification, CWE tagging, and green computing metrics.</p>
                 </div>
             </section>
         </div>
     </main>
 
-    <script src="/static/app.js?v=9"></script>
+    <script src="/static/app.js?v=10"></script>
 </body>
 </html>
