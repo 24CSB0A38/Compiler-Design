@@ -1,3 +1,11 @@
+"""
+Intelligent Compiler Suite — Flask Backend
+==========================================
+Compiles user-submitted C code via GCC, then runs it through an ML pipeline
+that classifies errors (lexical / syntax / semantic), assigns CWE security
+IDs, scores readability, profiles the developer, and estimates time complexity.
+"""
+
 import os
 import sys
 import subprocess
@@ -6,258 +14,374 @@ import json
 import re
 from flask import Flask, request, jsonify, render_template
 
-# Add backend scripts directory to path to reuse the ML framework directly
-_WEBAPP_DIR = os.path.dirname(os.path.abspath(__file__))
-_SCRIPTS_DIR = os.path.join(_WEBAPP_DIR, "..", "scripts")
-sys.path.insert(0, os.path.abspath(_SCRIPTS_DIR))
+# ── Path setup ────────────────────────────────────────────────────────────────
+_WEBAPP_DIR  = os.path.dirname(os.path.abspath(__file__))
+_SCRIPTS_DIR = os.path.abspath(os.path.join(_WEBAPP_DIR, "..", "scripts"))
+sys.path.insert(0, _SCRIPTS_DIR)
 
+# ── Load ML support modules ───────────────────────────────────────────────────
 _ml_modules_loaded = False
 try:
     from cwe_tagger import CWETagger
     from readability_scorer import ReadabilityScorer
     from profiler import CompilerFingerprintProfiler
     _ml_modules_loaded = True
-except ImportError as e:
-    print(f"Warning: Backend ML modules not found: {e}")
+except ImportError as exc:
+    print(f"[WARN] Backend ML modules unavailable: {exc}")
 
 app = Flask(__name__)
 
+# ── Paths ─────────────────────────────────────────────────────────────────────
 MODEL_PATH = os.path.join(_WEBAPP_DIR, "..", "compiler_error_model.pkl")
-TEMP_FILE = os.path.join(_WEBAPP_DIR, "temp_user_code.c")
+TEMP_FILE  = os.path.join(_WEBAPP_DIR, "temp_user_code.c")
+GCC_PATH   = os.path.join(_WEBAPP_DIR, "..", "mingw64", "bin", "gcc.exe")
+if not os.path.exists(GCC_PATH):
+    GCC_PATH = "gcc"   # fall back to PATH
 
-# Initialize global modules
-cwe_tagger = CWETagger() if _ml_modules_loaded else None
-readability_scorer = ReadabilityScorer() if _ml_modules_loaded else None
-profiler = CompilerFingerprintProfiler() if _ml_modules_loaded else None
+# ── Initialise global singletons ──────────────────────────────────────────────
+cwe_tagger          = CWETagger()               if _ml_modules_loaded else None
+readability_scorer  = ReadabilityScorer()        if _ml_modules_loaded else None
+profiler            = CompilerFingerprintProfiler() if _ml_modules_loaded else None
 
-# Load the ML Model dynamically. If not available, we return graceful errors.
+# ── Load ML model ─────────────────────────────────────────────────────────────
 model_loaded = False
-vectorizer = None
-ml_model = None
+vectorizer   = None
+ml_model     = None
 
 if os.path.exists(MODEL_PATH):
     try:
-        with open(MODEL_PATH, "rb") as f:
-            ml_model, vectorizer = pickle.load(f)
+        with open(MODEL_PATH, "rb") as fh:
+            ml_model, vectorizer = pickle.load(fh)
             model_loaded = True
-    except Exception as e:
-        print(f"Failed to load model: {e}")
+        print("[OK] ML model loaded successfully.")
+    except Exception as exc:
+        print(f"[WARN] Failed to load model: {exc}")
 
-def _custom_lexical_scan(code, temp_file_path):
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Helper: Custom Lexical Scanner
+# ══════════════════════════════════════════════════════════════════════════════
+def _custom_lexical_scan(code: str, temp_path: str) -> list[str]:
     """
-    Custom pre-compile scanner that detects invalid characters GCC may silently
-    accept (e.g. $ in identifiers, backticks, etc.) and returns synthetic errors.
+    Detects characters GCC may silently accept (e.g. $ in identifiers)
+    and synthesises realistic error lines for them.
     """
     INVALID_CHARS = {
         '$': "error: stray '$' in program",
         '`': "error: stray '`' in program",
         '@': "error: stray '@' in program",
     }
-    found_errors = []
-    for line_num, line in enumerate(code.splitlines(), start=1):
-        # Skip string/comment content  
-        stripped = re.sub(r'".*?"', '""', line)  # blank out string literals
-        stripped = re.sub(r'//.*', '', stripped)   # strip line comments
+    found: list[str] = []
+    for lineno, line in enumerate(code.splitlines(), start=1):
+        clean = re.sub(r'".*?"', '""', line)   # blank out string literals
+        clean = re.sub(r'//.*',  '',  clean)   # strip line comments
         for char, msg in INVALID_CHARS.items():
-            if char in stripped:
-                col = stripped.index(char) + 1
-                found_errors.append(f"{temp_file_path}:{line_num}:{col}: {msg}")
-    return found_errors
+            if char in clean:
+                col = clean.index(char) + 1
+                found.append(f"{temp_path}:{lineno}:{col}: {msg}")
+    return found
 
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Helper: Time Complexity Analyser
+# ══════════════════════════════════════════════════════════════════════════════
+def _analyze_time_complexity(code: str) -> dict:
+    """
+    Heuristic static analysis of C code to estimate Big-O time complexity.
+    Considers loop nesting depth, recursion, and known algorithm patterns.
+    """
+    lines = code.splitlines()
+
+    # Collect loop lines (skip comments)
+    loop_lines = [
+        ln for ln in lines
+        if re.search(r'\b(for|while|do)\b', ln) and not ln.strip().startswith('//')
+    ]
+    total_loops = len(loop_lines)
+
+    # Estimate nesting depth via indentation
+    nesting = 1
+    if total_loops >= 2:
+        indents = [len(ln) - len(ln.lstrip()) for ln in loop_lines]
+        if len(set(indents)) > 1:
+            nesting = 2
+        if total_loops >= 3 and nesting == 2:
+            deeper   = [i for i in indents if i > min(indents)]
+            deepest  = [i for i in deeper  if i > min(deeper)] if deeper else []
+            if deepest:
+                nesting = 3
+
+    # Detect recursion: any non-stdlib function called more than once
+    STDLIB = {'main', 'printf', 'scanf', 'malloc', 'free', 'calloc', 'realloc',
+               'memset', 'memcpy', 'strlen', 'strcpy', 'strcat', 'fopen', 'fclose'}
+    is_recursive = False
+    rec_func_name = None
+    for fn in re.findall(r'\b(\w+)\s*\([^)]*\)\s*\{', code):
+        if fn in STDLIB:
+            continue
+        occurrences = [m.start() for m in re.finditer(rf'\b{re.escape(fn)}\s*\(', code)]
+        if len(occurrences) > 1:
+            is_recursive   = True
+            rec_func_name  = fn
+            break
+
+    # Pattern flags
+    has_divide = bool(re.search(r'\bmid\b|half|n\s*/\s*2', code))
+    has_log    = bool(re.search(r'binary.search|bisect|\bi\s*[*/]=\s*2\b', code, re.I))
+    has_sort   = bool(re.search(r'qsort|sort|swap.*\bi\b.*\bj\b', code, re.I))
+
+    # Decision
+    if is_recursive and has_divide:
+        notation    = "O(n log n)"
+        label       = "Linearithmic"
+        explanation = (f"Recursive divide-and-conquer pattern detected "
+                       f"(function '{rec_func_name}'). Typical of merge sort / "
+                       f"binary search with recursion.")
+    elif is_recursive:
+        notation    = "O(2ⁿ)"
+        label       = "Exponential"
+        explanation = (f"Unbounded recursion in '{rec_func_name}' without "
+                       f"divide-and-conquer — potentially exponential "
+                       f"(e.g. naïve Fibonacci).")
+    elif has_sort and nesting >= 2:
+        notation    = "O(n log n)"
+        label       = "Linearithmic"
+        explanation = "Sort-like nested pattern detected — likely O(n log n)."
+    elif has_log:
+        notation    = "O(log n)"
+        label       = "Logarithmic"
+        explanation = "Binary halving / logarithmic traversal pattern found."
+    elif nesting == 3:
+        notation    = "O(n³)"
+        label       = "Cubic"
+        explanation = "Three levels of nested loops — typical of matrix multiplication."
+    elif nesting == 2:
+        notation    = "O(n²)"
+        label       = "Quadratic"
+        explanation = "Two nested loops — common in bubble/selection sort or brute-force 2-D algorithms."
+    elif total_loops == 1:
+        notation    = "O(n)"
+        label       = "Linear"
+        explanation = "Single loop iterates over input once."
+    elif total_loops == 0:
+        notation    = "O(1)"
+        label       = "Constant"
+        explanation = "No loops or recursion — code runs in constant time."
+    else:
+        notation    = "O(n)"
+        label       = "Linear"
+        explanation = f"{total_loops} flat loops detected — likely linear with a constant factor."
+
+    return {
+        "notation":    notation,
+        "label":       label,
+        "explanation": explanation,
+        "total_loops": total_loops,
+        "is_recursive": is_recursive,
+    }
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Helper: Row / Column extractor
+# ══════════════════════════════════════════════════════════════════════════════
+def _extract_row_col(raw_line: str) -> tuple[int | None, int | None]:
+    """Extract (row, col) from a GCC error line — returns (None, None) on failure."""
+    m = re.match(r'.+?:(\d+):(\d+):\s*', raw_line)
+    return (int(m.group(1)), int(m.group(2))) if m else (None, None)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Routes
+# ══════════════════════════════════════════════════════════════════════════════
 @app.route("/")
 def index():
     return render_template("index.html")
 
+
 @app.route("/analyze", methods=["POST"])
 def analyze_code():
     code_content = ""
-    
-    # 1. Handle File Upload OR Raw Text Submission
-    if "file" in request.files and request.files["file"].filename != "":
-        file = request.files["file"]
-        raw_data = file.read()
-        
-        # Robust decoding strategy
-        for encoding in ["utf-8", "latin-1", "cp1252"]:
+
+    # ── 1. Ingest code ────────────────────────────────────────────────────────
+    if "file" in request.files and request.files["file"].filename:
+        raw = request.files["file"].read()
+        for enc in ("utf-8", "latin-1", "cp1252"):
             try:
-                code_content = raw_data.decode(encoding)
+                code_content = raw.decode(enc)
                 break
             except UnicodeDecodeError:
                 continue
         else:
-            return jsonify({"error": "Failed to decode file. Please ensure it's a valid text file."}), 400
+            return jsonify({"error": "Unable to decode file — ensure it is a valid text file."}), 400
+
     elif "code_text" in request.form:
         code_content = request.form["code_text"]
     else:
         return jsonify({"error": "No code or file provided."}), 400
-        
+
     if not code_content.strip():
-         return jsonify({"error": "Submitted code is completely empty!"}), 400
-         
-    # 2. Write to Temp File for Compilation
-    with open(TEMP_FILE, "w", encoding="utf-8") as f:
-        f.write(code_content)
-        
-    # 3. Fire Compiler Hook
-    # Dynamically point to the local portable GCC
-    gcc_path = os.path.join(_WEBAPP_DIR, "..", "mingw64", "bin", "gcc.exe")
-    if not os.path.exists(gcc_path):
-        gcc_path = "gcc" # Fallback to standard PATH if available
-        
-    compiler_return_code = 1
+        return jsonify({"error": "Submitted code is empty."}), 400
+
+    # ── 2. Write to temp file ─────────────────────────────────────────────────
+    with open(TEMP_FILE, "w", encoding="utf-8") as fh:
+        fh.write(code_content)
+
+    # ── 3. Compile ────────────────────────────────────────────────────────────
+    compiler_rc = 1
     try:
         import shutil
-        if gcc_path == "gcc" and shutil.which("gcc") is None:
-            raise FileNotFoundError("GCC Missing")
-            
+        if GCC_PATH == "gcc" and shutil.which("gcc") is None:
+            raise FileNotFoundError("GCC not found on PATH")
+
         result = subprocess.run(
-            [gcc_path, "-fmax-errors=100", "-pedantic-errors", TEMP_FILE],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+            [GCC_PATH, "-fmax-errors=100", "-pedantic-errors", TEMP_FILE],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
         )
         error_lines = result.stderr.strip().split("\n")
-        compiler_return_code = result.returncode
+        compiler_rc = result.returncode
 
-        # Pre-compile custom lexical scanner for chars GCC might silently accept
-        custom_errors = _custom_lexical_scan(code_content, TEMP_FILE)
-        if custom_errors:
-            # Only add custom errors whose message isn't already in GCC output
-            gcc_text = " ".join(error_lines).lower()
-            for ce in custom_errors:
-                ce_msg = ce.split(": ", 2)[-1].lower()
-                if ce_msg not in gcc_text:
-                    error_lines.insert(0, ce)
+        # Inject custom lexical errors not caught by GCC
+        for ce in _custom_lexical_scan(code_content, TEMP_FILE):
+            ce_msg = ce.split(": ", 2)[-1].lower()
+            if ce_msg not in " ".join(error_lines).lower():
+                error_lines.insert(0, ce)
+
     except FileNotFoundError:
-        # FAST DEMO FALLBACK: If GCC is still installing or missing, we mock realistic compiler errors so the Dashboard still works!
+        # Demo fallback when GCC is unavailable
         error_lines = []
-        # Multi-error mock logic
         if ';' not in code_content:
-            error_lines.append(rf"{TEMP_FILE}:2:2: error: expected ';' before 'return'")
+            error_lines.append(f"{TEMP_FILE}:2:2: error: expected ';' before 'return'")
         if 'int' in code_content and '"' in code_content:
-            error_lines.append(rf"{TEMP_FILE}:3:5: error: invalid conversion from 'const char*' to 'int'")
+            error_lines.append(f"{TEMP_FILE}:3:5: error: invalid conversion from 'const char*' to 'int'")
         if 'null' in code_content.lower() or '*x' in code_content:
-            error_lines.append(rf"{TEMP_FILE}:4:5: error: pointer 'x' resulting in dereg of null")
+            error_lines.append(f"{TEMP_FILE}:4:5: error: pointer 'x' resulting in deref of null")
         if not error_lines:
-            error_lines.append(rf"{TEMP_FILE}:1:1: error: general syntax issue detected")
-        compiler_return_code = 1 
-        
-    # Clean up Temp File
-    if os.path.exists(TEMP_FILE):
-        os.remove(TEMP_FILE)
-        
-    # Extract ALL errors and warnings, then deduplicate by cleaned message
-    all_errors_raw = [line for line in error_lines if any(kw in line.lower() for kw in ["error:", "warning:", "note:"])]
-    if not all_errors_raw and error_lines and len(error_lines[0].strip()) > 5:
-        all_errors_raw = [error_lines[0]]
+            error_lines.append(f"{TEMP_FILE}:1:1: error: general syntax issue detected")
+        compiler_rc = 1
 
-    # Deduplicate: strip file:line:col prefix, keep first occurrence of each unique message
-    seen_msgs = set()
-    all_errors = []
-    for line in all_errors_raw:
-        clean_msg = re.sub(r".*?:\d+:\d+:\s*", "", line).strip().lower()
-        if clean_msg and clean_msg not in seen_msgs:
-            seen_msgs.add(clean_msg)
-            all_errors.append(line)
-        
-    if compiler_return_code == 0 and not all_errors:
+    finally:
+        if os.path.exists(TEMP_FILE):
+            os.remove(TEMP_FILE)
+
+    # ── 4. Filter & deduplicate errors ────────────────────────────────────────
+    KEYWORDS = ("error:", "warning:", "note:")
+    raw_errors = [
+        ln for ln in error_lines
+        if any(kw in ln.lower() for kw in KEYWORDS)
+    ]
+    if not raw_errors and error_lines and len(error_lines[0].strip()) > 5:
+        raw_errors = [error_lines[0]]
+
+    seen: set[str] = set()
+    all_errors: list[str] = []
+    for ln in raw_errors:
+        key = re.sub(r".+?:\d+:\d+:\s*", "", ln).strip().lower()
+        if key and key not in seen:
+            seen.add(key)
+            all_errors.append(ln)
+
+    # ── 5. Time complexity (always computed) ──────────────────────────────────
+    time_complexity = _analyze_time_complexity(code_content)
+
+    # ── 6. Success path ───────────────────────────────────────────────────────
+    if compiler_rc == 0 and not all_errors:
         return jsonify({
-            "status": "success",
-            "message": "Compilation Successful! ✅ No errors or vulnerabilities detected.",
+            "status":           "success",
+            "message":          "Compilation Successful — no errors or vulnerabilities detected.",
             "developer_profile": json.loads(profiler.profile_session([])),
-            "errors": []
+            "errors":           [],
+            "time_complexity":  time_complexity,
         })
-        
+
     if not model_loaded:
-        return jsonify({"error": "The Machine Learning Model (compiler_error_model.pkl) has not been trained yet. Please run train_model.py first!"}), 500
+        return jsonify({
+            "error": "ML model not loaded — run train_model.py first."
+        }), 500
 
-    # 4. Neural Network Pipeline execution
-    pipeline_report = []
-    session_predictions = []
-    
+    # ── 7. ML Pipeline ────────────────────────────────────────────────────────
+    # Rule sets (deterministic layer 1)
+    LEXICAL_RULES  = [
+        r"stray", r"missing terminating", r"invalid suffix",
+        r"empty character constant", r"null character",
+        r"invalid preprocessing directive", r"extra tokens at end of",
+    ]
+    SYNTAX_RULES   = [
+        r"expected ';'", r"expected '\)'", r"expected '\}'", r"expected '\]'",
+        r"expected expression", r"expected identifier", r"expected declaration",
+        r"before '\w' token", r"at end of input", r"unbalanced",
+        r"unrecognized escape",
+    ]
+    SEMANTIC_RULES = [
+        r"undeclared", r"has no member", r"not a member", r"conflicting types",
+        r"incompatible types", r"too many arguments", r"too few arguments",
+        r"void value not ignored", r"is not a function", r"does not refer to a type",
+        r"dereferencing pointer", r"subscripted value is", r"cannot convert",
+        r"size of array",
+    ]
+
+    pipeline_report:     list[dict] = []
+    session_predictions: list[dict] = []
+
     for i, raw_error in enumerate(all_errors, 1):
-        clean_error = re.sub(r".*?:\d+:\d+:\s*", "", raw_error).strip()
-        
-        # Predictive analytics
-        # --- LAYER 1: DETERMINISTIC RULE-BASED OVERRIDE (always correct) ---
-        # These patterns are unambiguous and override the ML model 100% of the time
-        LEXICAL_RULES = [
-            r"stray", r"missing terminating", r"invalid suffix", r"empty character constant",
-            r"null character", r"invalid preprocessing directive", r"extra tokens at end of"
-        ]
-        SYNTAX_RULES = [
-            r"expected ';'", r"expected '\)'", r"expected '\}'", r"expected '\]'",
-            r"expected expression", r"expected identifier", r"expected declaration",
-            r"before '\\w' token", r"at end of input", r"unbalanced", r"unrecognized escape"
-        ]
-        SEMANTIC_RULES = [
-            r"undeclared", r"has no member", r"not a member", r"conflicting types",
-            r"incompatible types", r"too many arguments", r"too few arguments",
-            r"void value not ignored", r"is not a function", r"does not refer to a type",
-            r"dereferencing pointer", r"subscripted value is", r"cannot convert", r"size of array"
-        ]
+        clean_error = re.sub(r".+?:\d+:\d+:\s*", "", raw_error).strip()
+        row, col    = _extract_row_col(raw_error)
+        lower_err   = clean_error.lower()
 
-        rule_prediction = None
-        clean_lower = clean_error.lower()
-        for pattern in LEXICAL_RULES:
-            if re.search(pattern, clean_lower):
-                rule_prediction = "lexical"
-                break
-        if not rule_prediction:
-            for pattern in SYNTAX_RULES:
-                if re.search(pattern, clean_lower):
-                    rule_prediction = "syntax"
-                    break
-        if not rule_prediction:
-            for pattern in SEMANTIC_RULES:
-                if re.search(pattern, clean_lower):
-                    rule_prediction = "semantic"
-                    break
+        # Layer 1 — deterministic rules
+        rule_pred = None
+        for pat in LEXICAL_RULES:
+            if re.search(pat, lower_err):
+                rule_pred = "lexical"; break
+        if not rule_pred:
+            for pat in SYNTAX_RULES:
+                if re.search(pat, lower_err):
+                    rule_pred = "syntax"; break
+        if not rule_pred:
+            for pat in SEMANTIC_RULES:
+                if re.search(pat, lower_err):
+                    rule_pred = "semantic"; break
 
-        # --- LAYER 2: ML MODEL (fallback for unknown patterns) ---
-        vec = vectorizer.transform([clean_error])
-        ml_prediction = ml_model.predict(vec)[0]
-        ml_confidence = max(ml_model.predict_proba(vec)[0])
+        # Layer 2 — ML model fallback
+        vec           = vectorizer.transform([clean_error])
+        ml_pred       = ml_model.predict(vec)[0]
+        ml_confidence = float(max(ml_model.predict_proba(vec)[0]))
 
-        # Use rule if matched, otherwise trust the ML model
-        if rule_prediction:
-            prediction = rule_prediction
-            confidence = 0.999  # Deterministic = 99.9% confidence
-        else:
-            prediction = ml_prediction
-            confidence = ml_confidence
+        prediction = rule_pred   if rule_pred else ml_pred
+        confidence = 0.999       if rule_pred else ml_confidence
+        is_ambiguous = confidence < 0.65
 
-        ambiguous_flag = True if confidence < 0.65 else False
-        
-        # Readability & Security
         readability = readability_scorer.generate_score(clean_error)
-        cwe_data = json.loads(cwe_tagger.tag_error(clean_error, prediction, confidence, cascade_group=f"Group_{i}"))
-        
-        # Combine JSON output for frontend
-        error_node = {
-            "id": i,
-            "raw": clean_error,
-            "predicted_class": prediction.upper(),
-            "confidence": round(confidence * 100, 1),
-            "is_ambiguous": ambiguous_flag,
+        cwe_data    = json.loads(
+            cwe_tagger.tag_error(clean_error, prediction, confidence,
+                                 cascade_group=f"Group_{i}")
+        )
+
+        pipeline_report.append({
+            "id":               i,
+            "raw":              clean_error,
+            "row":              row,
+            "col":              col,
+            "predicted_class":  prediction.upper(),
+            "confidence":       round(confidence * 100, 1),
+            "is_ambiguous":     is_ambiguous,
             "readability_score": readability["readability_score_out_of_10"],
-            "has_hints": readability["contains_hints"],
-            "cwe_id": cwe_data["cwe_id"],
-            "cwe_name": cwe_data["cwe_name"],
-            "severity": cwe_data["severity"].upper()
-        }
-        pipeline_report.append(error_node)
+            "has_hints":        readability["contains_hints"],
+            "cwe_id":           cwe_data["cwe_id"],
+            "cwe_name":         cwe_data["cwe_name"],
+            "severity":         cwe_data["severity"].upper(),
+        })
         session_predictions.append({"predicted_class": prediction})
-        
-    # 5. Developer Profiler Execution
+
     dev_profile = json.loads(profiler.profile_session(session_predictions))
-    
-    response_data = {
-        "status": "issues_found",
-        "total_errors": len(pipeline_report),
+
+    return jsonify({
+        "status":           "issues_found",
+        "total_errors":     len(pipeline_report),
         "developer_profile": dev_profile,
-        "errors": pipeline_report
-    }
-    
-    return jsonify(response_data)
+        "errors":           pipeline_report,
+        "time_complexity":  time_complexity,
+    })
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

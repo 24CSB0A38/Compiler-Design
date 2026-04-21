@@ -1,32 +1,49 @@
-# Large binary files
-# gcc.zip tracked via LFS
+# ── Large binaries (tracked via Git LFS) ──────────────────────────────────────
+gcc.zip
+
+# ── Local toolchains (too large for GitHub) ────────────────────────────────────
 mingw/
 mingw64/
 
-# Large recording files (exceed GitHub 100MB limit)
+# ── Week recording videos (exceed GitHub 100 MB limit) ────────────────────────
 Week_5 Recordings/
 Week_6 Recordings/
 Week_7 Recordings/
 
-# Python cache
+# ── Python artefacts ──────────────────────────────────────────────────────────
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
+*.egg
 *.egg-info/
 dist/
 build/
-*.egg
+.Python
 
-# Virtual environments
+# ── Virtual environments ──────────────────────────────────────────────────────
 venv/
 env/
 .venv/
+scripts/venv/
 
-# VS Code
+# ── Editor / IDE ──────────────────────────────────────────────────────────────
 .vscode/
+.idea/
+*.swp
+*.swo
 
-# OS files
+# ── OS artefacts ──────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# ── Flask temp files ──────────────────────────────────────────────────────────
+webapp/temp_user_code.c
+webapp/a.exe
+a.exe
+
+# ── Compiled output ───────────────────────────────────────────────────────────
+*.o
+*.out
+a.out
