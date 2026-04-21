@@ -280,67 +280,7 @@ header h1 {
     overflow-x: auto;
 }
 
-/* Code view mode (shown after analysis — replaces textarea for exact highlighting) */
-.code-view {
-    font-family: var(--font-mono);
-    font-size: 0.83rem;
-    line-height: 1.65;
-    background: #fafbfc;
-    overflow: auto;
-    max-height: 380px;
-    counter-reset: line;
-}
-.code-line {
-    display: flex;
-    min-height: 1.65em;
-    padding: 0 1rem 0 0;
-    white-space: pre;
-}
-.code-line.error-line {
-    background: rgba(220, 38, 38, 0.07);
-    border-left: 3px solid #dc2626;
-}
-.code-line.error-line .code-ln { color: #dc2626; }
-.code-ln {
-    min-width: 38px;
-    text-align: right;
-    padding: 0 0.55rem 0 0.45rem;
-    color: var(--text-dim);
-    background: #f1f5f9;
-    border-right: 1px solid var(--card-border);
-    user-select: none;
-    flex-shrink: 0;
-}
-.code-text-content {
-    padding-left: 1rem;
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.error-indicator {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: #dc2626;
-    font-weight: 600;
-    padding: 0.1rem 1rem 0.3rem calc(38px + 1rem + 3px);
-    background: rgba(220,38,38,0.04);
-    white-space: pre;
-}
 
-/* Edit button */
-.edit-btn {
-    width: 100%;
-    padding: 0.5rem;
-    background: #f1f5f9;
-    border: none;
-    border-top: 1px solid var(--card-border);
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-weight: 500;
-    transition: background 0.15s;
-}
-.edit-btn:hover { background: #e2e8f0; color: var(--text); }
 
 /* ── Submit Button ─────────────────────────────── */
 .submit-btn {

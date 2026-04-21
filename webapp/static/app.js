@@ -46,8 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const codeTextArea    = document.getElementById("code-text");
     const lineNums        = document.getElementById("line-nums");
     const editorBody      = document.getElementById("editor-body");
-    const codeView        = document.getElementById("code-view");
-    const editBtn         = document.getElementById("edit-btn");
     const editorInfo      = document.getElementById("editor-info");
 
     /* ════════════════════════════════════════
@@ -62,74 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     codeTextArea.addEventListener("scroll", () => { lineNums.scrollTop = codeTextArea.scrollTop; });
     updateLineNumbers();
 
-    /* ════════════════════════════════════════
-       EDITOR: Switch between textarea ↔ code-view
-       ════════════════════════════════════════ */
-    function showCodeView(codeStr, errorRows) {
-        /* Build a line-by-line rendered view with EXACT highlighting.
-           No pixel math — each line is a DOM element. */
-        const lines = codeStr.split("\n");
-        const errorRowSet = new Set(errorRows.map(r => r.row).filter(Boolean));
 
-        // Map row → list of errors for that row
-        const rowErrors = {};
-        errorRows.forEach(e => {
-            if (e.row) {
-                if (!rowErrors[e.row]) rowErrors[e.row] = [];
-                rowErrors[e.row].push(e);
-            }
-        });
-
-        codeView.innerHTML = "";
-        lines.forEach((lineText, idx) => {
-            const lineNo = idx + 1;
-            const isErr  = errorRowSet.has(lineNo);
-
-            const lineEl = document.createElement("div");
-            lineEl.className = "code-line" + (isErr ? " error-line" : "");
-
-            const lnEl = document.createElement("span");
-            lnEl.className = "code-ln";
-            lnEl.textContent = lineNo;
-
-            const txtEl = document.createElement("span");
-            txtEl.className = "code-text-content";
-            txtEl.textContent = lineText || " ";
-
-            lineEl.appendChild(lnEl);
-            lineEl.appendChild(txtEl);
-            codeView.appendChild(lineEl);
-
-            // If there are errors on this line, show a caret indicator
-            if (isErr && rowErrors[lineNo]) {
-                rowErrors[lineNo].forEach(e => {
-                    const ind = document.createElement("div");
-                    ind.className = "error-indicator";
-                    const col = e.col || 1;
-                    // Build caret pointer (spaces + ^)
-                    const spaces = " ".repeat(col - 1);
-                    ind.textContent = spaces + "^ " + e.raw;
-                    codeView.appendChild(ind);
-                });
-            }
-        });
-
-        // Swap visibility
-        editorBody.classList.add("hidden");
-        codeView.classList.remove("hidden");
-        editBtn.classList.remove("hidden");
-        editorInfo.textContent = `${errorRows.length} error${errorRows.length !== 1 ? "s" : ""} highlighted`;
-    }
-
-    function showTextarea() {
-        codeView.classList.add("hidden");
-        editorBody.classList.remove("hidden");
-        editBtn.classList.add("hidden");
-        editorInfo.textContent = "Ready";
-        updateLineNumbers();
-    }
-
-    editBtn.addEventListener("click", showTextarea);
 
     /* ════════════════════════════════════════
        FILE INPUT — read file into textarea
@@ -141,7 +72,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // Read file text and put in textarea (so highlighting works after analysis)
         const text = await file.text();
         codeTextArea.value = text;
-        showTextarea();   // make sure textarea is visible (no highlight yet)
         updateLineNumbers();
     });
 
@@ -150,8 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
             fileInput.value = "";
             fileNameDisplay.textContent = "";
         }
-        // Reset to textarea mode if user edits
-        showTextarea();
     });
 
     /* ════════════════════════════════════════
@@ -261,8 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 profTotal.textContent    = p.total_errors_in_session   || 0;
                 profDominant.textContent = p.dominant_error_category   || "None";
             }
-            // No highlighting for success
-            showTextarea();
+
             return;
         }
 
@@ -277,14 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
             profDominant.textContent = p.dominant_error_category   || "N/A";
         }
 
-        /* ── Exact error line highlighting ──
-           Switch the editor from textarea to code-view mode.
-           Each error row is rendered as a highlighted <div> —
-           100% accurate, no pixel math. */
-        const codeStr = codeTextArea.value;
-        if (codeStr.trim()) {
-            showCodeView(codeStr, data.errors);
-        }
+
 
         /* ── Error cards ── */
         const feedTitle = document.createElement("div");
